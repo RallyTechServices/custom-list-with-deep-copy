@@ -1,0 +1,6 @@
+{
+    "name": "Custom List with Deep Copy",
+    "sdk": "2.1",
+    "className": "custom-list-with-deep-copy",
+    "story": "US1334"
+}
