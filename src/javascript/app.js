@@ -25,6 +25,7 @@ Ext.define("custom-list-with-deep-copy", {
             failure: this.showErrorNotification,
             scope: this
         });
+        this.subscribe(this, 'statusUpdate', this.statusUpdate, this);
     },
     initializeApp: function(portfolioItemTypes){
         this.portfolioItemTypePaths = portfolioItemTypes;
@@ -101,6 +102,9 @@ Ext.define("custom-list-with-deep-copy", {
                 }
             }
         }];
+    },
+    statusUpdate: function(msg){
+        Rally.ui.notify.Notifier.showStatus({message: msg});
     },
     getTypesToCopy: function(){
 

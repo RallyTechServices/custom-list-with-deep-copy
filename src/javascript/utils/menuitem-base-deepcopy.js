@@ -40,9 +40,11 @@ Ext.define('Rally.ui.menu.bulk.DeepCopyBase', {
                     deferred.resolve({record: record, errorMessage: errorMsg});
                 },
                 statusupdate: function(done, total){
-                    Rally.ui.notify.Notifier.showStatus({message:Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total)});
-                   // var msg = Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total);
-                   // me.fireEvent('statusupdate',msg);
+                   // Rally.ui.notify.Notifier.showStatus({message:Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total)});
+                    var msg = Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total);
+                    this.publish('statusUpdate', msg);
+
+                    // me.fireEvent('statusupdate',msg);
                 },
                 scope: this
             }
