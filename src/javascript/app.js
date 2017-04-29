@@ -26,6 +26,17 @@ Ext.define("custom-list-with-deep-copy", {
             scope: this
         });
         this.subscribe(this, 'statusUpdate', this.statusUpdate, this);
+        this.subscribe(this, 'maskUpdate', this.maskUpdate, this);
+        this.subscribe(this, 'copyComplete', this.copyComplete, this);
+        this.subscribe(this, 'copyError', this.copyError, this);
+    },
+    maskUpdate: function(arg){
+
+        if (!arg || arg === ''){
+            arg = false;
+        }
+        this.setLoading(arg);
+        this.refresh();
     },
     initializeApp: function(portfolioItemTypes){
         this.portfolioItemTypePaths = portfolioItemTypes;
@@ -104,7 +115,18 @@ Ext.define("custom-list-with-deep-copy", {
         }];
     },
     statusUpdate: function(msg){
-        Rally.ui.notify.Notifier.showStatus({message: msg});
+        Rally.ui.notify.Notifier.hide();
+        Rally.ui.notify.Notifier.show({message: msg, showForever: true});
+    },
+    copyComplete: function(msg){
+        this.setLoading(false);
+        Rally.ui.notify.Notifier.hide();
+        Rally.ui.notify.Notifier.show({message: msg, duration: 5000});
+    },
+    copyError: function(msg){
+        this.setLoading(false);
+        Rally.ui.notify.Notifier.hide();
+        Rally.ui.notify.Notifier.showError({message: msg, duration: 10000, saveDelay: 500});
     },
     getTypesToCopy: function(){
 
