@@ -19,22 +19,30 @@ Ext.define('Rally.ui.menu.bulk.DeepCopyBase', {
     _copyRecord: function(record, parent){
         var deferred = Ext.create('Deft.Deferred');
         var fid = record.get('FormattedID');
+        var me = this;
+
+        this.fireEvent('loadtree');
+        Rally.ui.notify.Notifier.showStatus({message: 'Retreiving Data...'});
 
         var artifactTree = Ext.create('Rally.technicalservices.ArtifactTree',{
             portfolioItemTypes: this.portfolioItemTypes,
             listeners: {
                 treeloaded: function(tree){
+                   // me.fireEvent('loadtreecomplete');
                     tree.deepCopy(parent);
                 },
                 copycompleted: function(rootRecord){
+                   // me.fireEvent('copycomplete');
                     deferred.resolve({record: record});
                 },
                 copyerror: function(errorMsg){
+                  //  me.fireEvent('copyerror',{record: record, errorMessage: errorMsg});
                     deferred.resolve({record: record, errorMessage: errorMsg});
                 },
                 statusupdate: function(done, total){
                     Rally.ui.notify.Notifier.showStatus({message:Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total)});
-                    this.fireEvent('statusupdate',done,total);
+                   // var msg = Ext.String.format("{0}: {1} of {2} Artifacts copied...", fid, done, total);
+                   // me.fireEvent('statusupdate',msg);
                 },
                 scope: this
             }
