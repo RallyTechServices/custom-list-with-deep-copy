@@ -580,20 +580,24 @@ Ext.define('Rally.technicalservices.ArtifactTree',{
 
         _.each(collectionFields, function(cf){
             if (artifact.get(cf) && artifact.get(cf).Count && artifact.get(cf).Count > 0){
-                //promises.push(this._loadCollection(artifact, cf, false, cf === 'Tags'));
-                promises.push(function() {
-                    return this.copyArtifact(oid, overrides);
+                promises.push(function(){
+                    return this._loadCollection(artifact, cf, false, cf === 'Tags')
                 });
+                //promises.push(function() {
+                //    return this.copyArtifact(oid, {});
+                //});
             }
         }, this);
 
         if (promises.length > 0){
-            Deft.Chain.sequence(promises).then({
+            Deft.Chain.sequence(promises, this).then({
                 success: function(){
                     this.logger.log('artifact collections loaded', artifact);
                     this._loadArtifactChildren(artifact)
                 },
-                failure: function(){},
+                failure: function(msg){
+                    this.logger.log('failure loading artifact collections', msg);
+                },
                 scope: this
             });
         } else {
@@ -645,8 +649,18 @@ Ext.define('Rally.technicalservices.ArtifactTree',{
 
         this.tree[parentOid][collectionName] = [];
 
+        var filters = [];
+        if (!Ext.Array.contains(['Tags','Attachments'],collectionName)){
+            filters = [{
+                property: 'Project.State',
+                value: 'Open'
+            }];
+        }
+
+
         artifact.getCollection(collectionName).load({
             fetch: ['ObjectID'],
+            filters: filters,
             callback: function(records, operation, success) {
                 this.logger.log('_loadCollection callback', collectionName, records, success);
 
