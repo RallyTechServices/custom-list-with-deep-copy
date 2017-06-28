@@ -14,7 +14,8 @@ Ext.define("custom-list-with-deep-copy", {
 
     config: {
         defaultSettings: {
-            rootModelTypePath: 'HierarchicalRequirement'
+            rootModelTypePath: 'HierarchicalRequirement',
+            query: null
         }
     },
 
@@ -42,12 +43,19 @@ Ext.define("custom-list-with-deep-copy", {
         this.portfolioItemTypePaths = portfolioItemTypes;
         this.buildTreeStore();
     },
+    getQueryFilter: function(){
+       if (this.getSetting('query')){
+         return Rally.data.wsapi.Filter.fromQueryString(this.getSetting('query'));
+       }
+       return [];
+    },
     buildTreeStore: function(){
         this.down('#display_box').removeAll();
 
         Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
             models: [this.getRootModelTypePath()],
-            enableHierarchy: true
+            enableHierarchy: true,
+            filters: this.getQueryFilter()
         }).then({
             success: this.buildGridboard,
             scope: this
@@ -68,7 +76,8 @@ Ext.define("custom-list-with-deep-copy", {
             gridConfig: {
                 store: store,
                 storeConfig: {
-                    pageSize: 200
+                    pageSize: 200,
+                    filters: this.getQueryFilter()
                 },
                 columnCfgs: [
                     'Name',
@@ -108,7 +117,7 @@ Ext.define("custom-list-with-deep-copy", {
                 {
                     collapsed: false,
                     quickFilterPanelConfig: {
-                        defaultFields: ['Owner']
+                        defaultFields: ['ArtifactSearch','Owner']
                     }
                 }
             }
@@ -186,6 +195,8 @@ Ext.define("custom-list-with-deep-copy", {
             valueField: 'TypePath',
             fieldLabel: 'Artifact Type',
             labelAlign: 'right'
+        },{
+          type: 'query'
         }];
     },
     getOptions: function() {
@@ -201,9 +212,9 @@ Ext.define("custom-list-with-deep-copy", {
         if ( this.about_dialog ) { this.about_dialog.destroy(); }
         this.about_dialog = Ext.create('Rally.technicalservices.InfoLink',{});
     },
-    
+
     isExternal: function(){
         return typeof(this.getAppId()) == 'undefined';
     }
-    
+
 });
